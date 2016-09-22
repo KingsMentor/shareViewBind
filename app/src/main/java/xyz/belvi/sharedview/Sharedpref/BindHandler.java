@@ -15,8 +15,9 @@ public class BindHandler {
     private Object target;
 
 
-    public BindHandler(Field targetField, SharedView sharedView) {
+    public BindHandler(Field targetField, Object target, SharedField sharedView) {
         this.targetField = targetField;
+        this.target = target;
         this.sharedObj = sharedView.dataType();
         this.operationType = sharedView.operationType();
     }
