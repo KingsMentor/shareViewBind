@@ -35,7 +35,7 @@ public class SharedBind extends Validator implements SharedPreferences.OnSharedP
                 if (methodBindHandlers == null)
                     methodBindHandlers = new ArrayList<>();
 
-                methodBindHandlers.add(new BindHandler(method, obj, sharedMethod));
+                methodBindHandlers.add(new BindHandler(method, target, sharedMethod));
 
                 methodBindHandlerHashMap.put(sharedMethod.key(), methodBindHandlers);
             }
@@ -45,18 +45,13 @@ public class SharedBind extends Validator implements SharedPreferences.OnSharedP
             if (field.isAnnotationPresent(SharedView.class)) {
                 Annotation annotation = field.getAnnotation(SharedView.class);
                 SharedView sharedView = (SharedView) annotation;
+                ArrayList<BindHandler> fieldBindHandlers = fieldBindHandlerHashMap.get(sharedView.key());
+                if (fieldBindHandlers == null)
+                    fieldBindHandlers = new ArrayList<>();
+                fieldBindHandlers.add(new BindHandler(field, sharedView));
+                fieldBindHandlerHashMap.put(sharedView.key(), fieldBindHandlers);
+                Log.e("done", "mdf");
 
-                try {
-                    ArrayList<BindHandler> fieldBindHandlers = fieldBindHandlerHashMap.get(sharedView.key());
-                    if (fieldBindHandlers == null)
-                        fieldBindHandlers = new ArrayList<>();
-                    fieldBindHandlers.add(new BindHandler(field.get(target), sharedView));
-                    fieldBindHandlerHashMap.put(sharedView.key(), fieldBindHandlers);
-                    Log.e("done", "mdf");
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
-                    Log.e("error", "mdf");
-                }
                 Log.e("result", field.getGenericType().toString());
 
             }
@@ -77,7 +72,7 @@ public class SharedBind extends Validator implements SharedPreferences.OnSharedP
         if (methodBinds != null) {
             for (BindHandler bindHandler : methodBinds) {
                 try {
-                    bindHandler.getMethod().invoke(bindHandler.getTarget().newInstance());
+                    bindHandler.getMethod().invoke(bindHandler.getTarget().getClass().newInstance());
                 } catch (IllegalAccessException e) {
                     e.printStackTrace();
                 } catch (InvocationTargetException e) {
@@ -91,9 +86,19 @@ public class SharedBind extends Validator implements SharedPreferences.OnSharedP
         ArrayList<BindHandler> viewBinds = fieldBindHandlerHashMap.get(s);
         if (viewBinds != null) {
             for (BindHandler bindHandler : viewBinds) {
-                if (isView(bindHandler.getTargetObj())) {
-                    if (bindHandler.getSharedObj() == SharedObj.STRING) {
-                        ((AppCompatTextView) (bindHandler.getTargetObj())).setText(sharedPreferences.getString(s, bindHandler.getSharedObj().getDefValue().toString()));
+                if (bindHandler.getSharedObj() == SharedObj.STRING) {
+                    if (isView(bindHandler.getTargetField())) {
+                        try {
+                            ((AppCompatTextView) (bindHandler.getTargetField().get(bindHandler.getTarget()))).setText(sharedPreferences.getString(s, bindHandler.getSharedObj().getDefValue().toString()));
+                        } catch (IllegalAccessException e) {
+                            e.printStackTrace();
+                        }
+                    }else{
+                        try {
+                            bindHandler.getTargetField().set(bindHandler.getTarget(),sharedPreferences.getString(s,bindHandler.getSharedObj().getDefValue().toString()));
+                        } catch (IllegalAccessException e) {
+                            e.printStackTrace();
+                        }
                     }
                 }
             }

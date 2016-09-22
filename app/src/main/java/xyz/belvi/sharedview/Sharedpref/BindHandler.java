@@ -1,7 +1,6 @@
 package xyz.belvi.sharedview.Sharedpref;
 
-import android.view.View;
-
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
 /**
@@ -9,25 +8,33 @@ import java.lang.reflect.Method;
  */
 
 public class BindHandler {
-    private Object targetObj;
+    private Field targetField;
     private OperationType operationType;
     private SharedObj sharedObj;
     private Method method;
-    private Class target;
+    private Object target;
 
 
-    public BindHandler(Object targetObj, SharedView sharedView) {
-        this.targetObj = targetObj;
+    public BindHandler(Field targetField, SharedView sharedView) {
+        this.targetField = targetField;
         this.sharedObj = sharedView.dataType();
         this.operationType = sharedView.operationType();
     }
 
 
-    public BindHandler(Method method, Class target, SharedMethod sharedView) {
+    public BindHandler(Method method, Object target, SharedMethod sharedView) {
         this.method = method;
         this.target = target;
         this.sharedObj = sharedView.dataType();
         this.operationType = sharedView.operationType();
+    }
+
+    public OperationType getOperationType() {
+        return this.operationType;
+    }
+
+    public void setOperationType(OperationType operationType) {
+        this.operationType = operationType;
     }
 
     public Method getMethod() {
@@ -38,20 +45,20 @@ public class BindHandler {
         this.method = method;
     }
 
-    public Class getTarget() {
+    public Object getTarget() {
         return this.target;
     }
 
-    public void setTarget(Class target) {
+    public void setTarget(Object target) {
         this.target = target;
     }
 
-    public Object getTargetObj() {
-        return this.targetObj;
+    public Field getTargetField() {
+        return this.targetField;
     }
 
-    public void setTargetObj(View view) {
-        this.targetObj = view;
+    public void setTargetField(Field targetField) {
+        this.targetField = targetField;
     }
 
     public SharedObj getSharedObj() {
