@@ -11,39 +11,20 @@ import java.lang.reflect.Method;
 public class BindHandler {
     private View view;
     private SharedObj sharedObj;
-    private boolean isMethod, hasViewBinding;
     private Method method;
     private Class target;
 
 
-    public BindHandler(boolean hasViewBinding, View view, SharedObj sharedObj) {
+    public BindHandler(View view, SharedObj sharedObj) {
         this.view = view;
-        this.hasViewBinding = hasViewBinding;
         this.sharedObj = sharedObj;
     }
 
 
-    public BindHandler(boolean isMethod, Method method, Class target, SharedObj sharedObj) {
-        this.isMethod = isMethod;
+    public BindHandler(Method method, Class target, SharedObj sharedObj) {
         this.method = method;
         this.target = target;
         this.sharedObj = sharedObj;
-    }
-
-    public boolean hasViewBinding() {
-        return this.hasViewBinding;
-    }
-
-    public void setHasViewBinding(boolean hasViewBinding) {
-        this.hasViewBinding = hasViewBinding;
-    }
-
-    public boolean isMethod() {
-        return this.isMethod;
-    }
-
-    public void setMethod(boolean method) {
-        this.isMethod = method;
     }
 
     public Method getMethod() {

@@ -2,7 +2,6 @@ package xyz.belvi.sharedview.Sharedpref;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.support.v7.widget.AppCompatTextView;
 import android.util.Log;
 import android.view.View;
 
@@ -10,6 +9,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
@@ -18,7 +18,8 @@ import java.util.HashMap;
 
 public class SharedBind implements SharedPreferences.OnSharedPreferenceChangeListener {
 
-    HashMap<String, BindHandler> bindHandlerHashMap = new HashMap();
+    HashMap<String, ArrayList<BindHandler>> viewBindHandlerHashMap = new HashMap();
+    HashMap<String, ArrayList<BindHandler>> methodBindHandlerHashMap = new HashMap();
 
     public void shareView(Object target, Context context) {
 
@@ -30,10 +31,13 @@ public class SharedBind implements SharedPreferences.OnSharedPreferenceChangeLis
 
                 Annotation annotation = method.getAnnotation(SharedMethod.class);
                 SharedMethod sharedMethod = (SharedMethod) annotation;
+                ArrayList<BindHandler> methodBindHandlers = methodBindHandlerHashMap.get(sharedMethod.key());
+                if (methodBindHandlers == null)
+                    methodBindHandlers = new ArrayList<>();
 
-                BindHandler bindHandler = new BindHandler(true, method, obj, sharedMethod.dataType());
-                // if enabled = true (default)
-                bindHandlerHashMap.put(sharedMethod.key(), bindHandler);
+                methodBindHandlers.add(new BindHandler(method, obj, sharedMethod.dataType()));
+
+                methodBindHandlerHashMap.put(sharedMethod.key(), methodBindHandlers);
             }
 
         }
@@ -43,15 +47,11 @@ public class SharedBind implements SharedPreferences.OnSharedPreferenceChangeLis
                 SharedView sharedView = (SharedView) annotation;
 
                 try {
-                    BindHandler bindHandler = bindHandlerHashMap.get(sharedView.key());
-                    if (bindHandler == null)
-                        bindHandler = new BindHandler(true, (View) field.get(target), sharedView.dataType());
-                    else {
-                        bindHandler.setHasViewBinding(true);
-                        bindHandler.setView((View) field.get(target));
-                        bindHandler.setSharedObj(sharedView.dataType());
-                    }
-                    bindHandlerHashMap.put(sharedView.key(), bindHandler);
+                    ArrayList<BindHandler> viewBindHandlers = methodBindHandlerHashMap.get(sharedView.key());
+                    if (viewBindHandlers == null)
+                        viewBindHandlers = new ArrayList<>();
+                    viewBindHandlers.add(new BindHandler((View) field.get(target), sharedView.dataType()));
+                    viewBindHandlerHashMap.put(sharedView.key(), viewBindHandlers);
                     Log.e("done", "mdf");
                 } catch (IllegalAccessException e) {
                     e.printStackTrace();
@@ -73,12 +73,11 @@ public class SharedBind implements SharedPreferences.OnSharedPreferenceChangeLis
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
         Log.e("load", s);
         sharedPreferences.unregisterOnSharedPreferenceChangeListener(this);
-        BindHandler viewBind = bindHandlerHashMap.get(s);
-        if (viewBind != null) {
-            if (viewBind.isMethod()) {
+        ArrayList<BindHandler> methodBinds = methodBindHandlerHashMap.get(s);
+        if (methodBinds != null) {
+            for (BindHandler bindHandler : methodBinds) {
                 try {
-
-                    viewBind.getMethod().invoke(viewBind.getTarget().newInstance());
+                    bindHandler.getMethod().invoke(bindHandler.getTarget().newInstance());
                 } catch (IllegalAccessException e) {
                     e.printStackTrace();
                 } catch (InvocationTargetException e) {
@@ -87,12 +86,23 @@ public class SharedBind implements SharedPreferences.OnSharedPreferenceChangeLis
                     e.printStackTrace();
                 }
             }
-            if (viewBind.hasViewBinding()) {
-                if (viewBind.getSharedObj() == SharedObj.STRING) {
-                    ((AppCompatTextView) (bindHandlerHashMap.get(s).getView())).setText(sharedPreferences.getString(s, viewBind.getSharedObj().getDefValue().toString()));
+        }
+
+        ArrayList<BindHandler> viewBinds = methodBindHandlerHashMap.get(s);
+        if (viewBinds != null) {
+            for (BindHandler bindHandler : viewBinds) {
+                try {
+                    bindHandler.getMethod().invoke(bindHandler.getTarget().newInstance());
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                } catch (InvocationTargetException e) {
+                    e.printStackTrace();
+                } catch (InstantiationException e) {
+                    e.printStackTrace();
                 }
             }
-
         }
+
+
     }
 }
