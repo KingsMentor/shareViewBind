@@ -12,7 +12,10 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 public @interface SharedMethod {
+
     SharedObj dataType() default SharedObj.STRING;
+
+    OperationType operationType() default OperationType.CHANGE_TEXT;
 
     String key() default "default";
 

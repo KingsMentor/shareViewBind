@@ -15,6 +15,8 @@ public @interface SharedView {
     SharedObj dataType() default SharedObj.STRING;
 
 
+    OperationType operationType() default OperationType.CHANGE_TEXT;
+
     String key() default "default";
 
 }

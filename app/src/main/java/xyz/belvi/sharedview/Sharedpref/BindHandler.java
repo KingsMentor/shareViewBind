@@ -9,22 +9,25 @@ import java.lang.reflect.Method;
  */
 
 public class BindHandler {
-    private View view;
+    private Object targetObj;
+    private OperationType operationType;
     private SharedObj sharedObj;
     private Method method;
     private Class target;
 
 
-    public BindHandler(View view, SharedObj sharedObj) {
-        this.view = view;
-        this.sharedObj = sharedObj;
+    public BindHandler(Object targetObj, SharedView sharedView) {
+        this.targetObj = targetObj;
+        this.sharedObj = sharedView.dataType();
+        this.operationType = sharedView.operationType();
     }
 
 
-    public BindHandler(Method method, Class target, SharedObj sharedObj) {
+    public BindHandler(Method method, Class target, SharedMethod sharedView) {
         this.method = method;
         this.target = target;
-        this.sharedObj = sharedObj;
+        this.sharedObj = sharedView.dataType();
+        this.operationType = sharedView.operationType();
     }
 
     public Method getMethod() {
@@ -43,12 +46,12 @@ public class BindHandler {
         this.target = target;
     }
 
-    public View getView() {
-        return this.view;
+    public Object getTargetObj() {
+        return this.targetObj;
     }
 
-    public void setView(View view) {
-        this.view = view;
+    public void setTargetObj(View view) {
+        this.targetObj = view;
     }
 
     public SharedObj getSharedObj() {
