@@ -26,7 +26,7 @@ public class MainActivity extends AppCompatActivity {
     public TextView helloPref;
 
     @SharedField(key = "sample")
-    public transient int data = 2;
+    public  int data = 2;
 
     SharedBind sharedBind = new SharedBind();
 

@@ -81,7 +81,9 @@ public class SharedBind extends Validator implements SharedPreferences.OnSharedP
 
                             ((AppCompatTextView) (bindHandler.getTargetField().get(bindHandler.getTarget()))).setText(sharedPreferences.getString(s, bindHandler.getSharedObj().getDefValue().toString()));
                         } else {
+                            Log.e("value", "" + bindHandler.getTargetField().getInt(bindHandler.getTarget()));
                             bindHandler.getTargetField().setInt(bindHandler.getTarget(), 234);
+                            Log.e("jksj","K");
 //                            bindHandler.getTargetField().set(bindHandler.getTarget(), sharedPreferences.getString(s, bindHandler.getSharedObj().getDefValue().toString()));
                         }
                     } catch (IllegalAccessException e) {
@@ -96,12 +98,10 @@ public class SharedBind extends Validator implements SharedPreferences.OnSharedP
         if (methodBinds != null) {
             for (BindHandler bindHandler : methodBinds) {
                 try {
-                    bindHandler.getMethod().invoke(bindHandler.getTarget().getClass().newInstance());
+                    bindHandler.getMethod().invoke(bindHandler.getTarget());
                 } catch (IllegalAccessException e) {
                     e.printStackTrace();
                 } catch (InvocationTargetException e) {
-                    e.printStackTrace();
-                } catch (InstantiationException e) {
                     e.printStackTrace();
                 }
             }
