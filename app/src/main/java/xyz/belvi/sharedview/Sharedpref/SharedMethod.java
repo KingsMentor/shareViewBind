@@ -15,6 +15,8 @@ public @interface SharedMethod {
 
     SharedObj dataType() default SharedObj.STRING;
 
+    int priority() default 0;
+
     OperationType operationType() default OperationType.CHANGE_TEXT;
 
     String key() default "default";

@@ -15,9 +15,9 @@ import android.widget.TextView;
 import java.util.Calendar;
 
 import xyz.belvi.sharedview.Sharedpref.SharedBind;
+import xyz.belvi.sharedview.Sharedpref.SharedField;
 import xyz.belvi.sharedview.Sharedpref.SharedMethod;
 import xyz.belvi.sharedview.Sharedpref.SharedObj;
-import xyz.belvi.sharedview.Sharedpref.SharedField;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -26,7 +26,7 @@ public class MainActivity extends AppCompatActivity {
     public TextView helloPref;
 
     @SharedField(key = "sample")
-    public  int data = 2;
+    public int data = 5;
 
     SharedBind sharedBind = new SharedBind();
 
@@ -40,7 +40,9 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         helloPref = (TextView) findViewById(R.id.fieldTxt);
-        sharedBind.shareView(this, this);
+        sharedBind.shareView(this);
+        sharedBind.bind(getSharedPreferences("default", Context.MODE_PRIVATE));
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -48,8 +50,8 @@ public class MainActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
-                sharedBind.putString(getSharedPreferences("default", Context.MODE_PRIVATE), "sample", "yea" + Calendar.getInstance().getTimeInMillis());
+                getSharedPreferences("default", Context.MODE_PRIVATE).edit().putString("sample", "yea" + Calendar.getInstance().getTimeInMillis()).commit();
+//                sharedBind.putString(getSharedPreferences("default", Context.MODE_PRIVATE), "sample", "yea" + Calendar.getInstance().getTimeInMillis());
                 Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
             }

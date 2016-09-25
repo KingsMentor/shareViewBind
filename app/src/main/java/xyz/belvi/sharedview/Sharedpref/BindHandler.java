@@ -13,25 +13,36 @@ public class BindHandler {
     private SharedObj sharedObj;
     private Method method;
     private Object target;
+    private int priority;
 
 
     public BindHandler(Field targetField, Object target, SharedField sharedView) {
         this.targetField = targetField;
         this.target = target;
-        this.sharedObj = sharedView.dataType();
-        this.operationType = sharedView.operationType();
+        sharedObj = sharedView.dataType();
+        operationType = sharedView.operationType();
+        priority = sharedView.priority();
     }
 
 
-    public BindHandler(Method method, Object target, SharedMethod sharedView) {
+    public BindHandler(Method method, Object target, SharedMethod sharedMethod) {
         this.method = method;
         this.target = target;
-        this.sharedObj = sharedView.dataType();
-        this.operationType = sharedView.operationType();
+        sharedObj = sharedMethod.dataType();
+        operationType = sharedMethod.operationType();
+        priority = sharedMethod.priority();
+    }
+
+    public int getPriority() {
+        return this.priority;
+    }
+
+    public void setPriority(int priority) {
+        this.priority = priority;
     }
 
     public OperationType getOperationType() {
-        return this.operationType;
+        return operationType;
     }
 
     public void setOperationType(OperationType operationType) {
@@ -39,7 +50,7 @@ public class BindHandler {
     }
 
     public Method getMethod() {
-        return this.method;
+        return method;
     }
 
     public void setMethod(Method method) {
@@ -47,7 +58,7 @@ public class BindHandler {
     }
 
     public Object getTarget() {
-        return this.target;
+        return target;
     }
 
     public void setTarget(Object target) {
@@ -55,7 +66,7 @@ public class BindHandler {
     }
 
     public Field getTargetField() {
-        return this.targetField;
+        return targetField;
     }
 
     public void setTargetField(Field targetField) {
@@ -63,7 +74,7 @@ public class BindHandler {
     }
 
     public SharedObj getSharedObj() {
-        return this.sharedObj;
+        return sharedObj;
     }
 
     public void setSharedObj(SharedObj sharedObj) {

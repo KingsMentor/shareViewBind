@@ -1,7 +1,7 @@
 package xyz.belvi.sharedview.Sharedpref;
 
-import android.content.Context;
 import android.content.SharedPreferences;
+import android.preference.Preference;
 import android.support.v7.widget.AppCompatTextView;
 import android.util.Log;
 
@@ -10,47 +10,61 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 
 /**
  * Created by zone2 on 9/21/16.
  */
 
-public class SharedBind extends Validator implements SharedPreferences.OnSharedPreferenceChangeListener {
+public class SharedBind extends Validator implements SharedPreferences.OnSharedPreferenceChangeListener, Preference.OnPreferenceChangeListener {
 
-    HashMap<String, ArrayList<BindHandler>> fieldBindHandlerHashMap = new HashMap();
-    HashMap<String, ArrayList<BindHandler>> methodBindHandlerHashMap = new HashMap();
-
-    public void shareView(Object target, Context context) {
-
-        Class<?> obj = target.getClass();
-        for (Method method : obj.getDeclaredMethods()) {
-
-            // if method is annotated with @Test
-            if (method.isAnnotationPresent(SharedMethod.class)) {
+    HashMap<String, ArrayList<BindHandler>> bindHandlerHashMap = new HashMap();
 
 
-                Annotation annotation = method.getAnnotation(SharedMethod.class);
-                SharedMethod sharedMethod = (SharedMethod) annotation;
-                ArrayList<BindHandler> methodBindHandlers = methodBindHandlerHashMap.get(sharedMethod.key());
-                if (methodBindHandlers == null)
-                    methodBindHandlers = new ArrayList<>();
+    ArrayList<SharedPreferences> preferenceTracker = new ArrayList<>();
 
-                methodBindHandlers.add(new BindHandler(method, target, sharedMethod));
-
-                methodBindHandlerHashMap.put(sharedMethod.key(), methodBindHandlers);
+    public void bind(SharedPreferences... preferences) {
+        for (SharedPreferences preference : preferences)
+            if (!preferenceTracker.contains(preference)) {
+                preference.registerOnSharedPreferenceChangeListener(this);
+                preferenceTracker.add(preference);
             }
+    }
 
+
+    public void unBind(SharedPreferences preferences) {
+        if (!preferenceTracker.contains(preferences)) {
+            preferences.unregisterOnSharedPreferenceChangeListener(this);
+            preferenceTracker.remove(preferences);
         }
+    }
+
+    public void unBindAll() {
+        for (SharedPreferences preferences : preferenceTracker)
+            preferences.registerOnSharedPreferenceChangeListener(this);
+        preferenceTracker.clear();
+    }
+
+    public void shareView(Object target) {
+        Class<?> obj = target.getClass();
+        addFields(target, obj);
+        addMethods(target, obj);
+
+    }
+
+
+    private void addFields(Object target, Class<?> obj) {
+
         for (Field field : obj.getDeclaredFields()) {
             if (field.isAnnotationPresent(SharedField.class)) {
                 Annotation annotation = field.getAnnotation(SharedField.class);
                 SharedField sharedView = (SharedField) annotation;
-                ArrayList<BindHandler> fieldBindHandlers = fieldBindHandlerHashMap.get(sharedView.key());
+                ArrayList<BindHandler> fieldBindHandlers = bindHandlerHashMap.get(sharedView.key());
                 if (fieldBindHandlers == null)
                     fieldBindHandlers = new ArrayList<>();
                 fieldBindHandlers.add(new BindHandler(field, target, sharedView));
-                fieldBindHandlerHashMap.put(sharedView.key(), fieldBindHandlers);
+                bindHandlerHashMap.put(sharedView.key(), fieldBindHandlers);
                 Log.e("done", "mdf");
 
                 Log.e("result", field.getGenericType().toString());
@@ -59,52 +73,76 @@ public class SharedBind extends Validator implements SharedPreferences.OnSharedP
         }
     }
 
-    public void putString(SharedPreferences preferences, String key, String value) {
-        preferences.registerOnSharedPreferenceChangeListener(this);
-        preferences.edit().putString(key, value).commit();
-    }
+    private void addMethods(Object target, Class<?> obj) {
+        for (Method method : obj.getDeclaredMethods()) {
 
+            // if method is annotated with @Test
+            if (method.isAnnotationPresent(SharedMethod.class)) {
+
+
+                Annotation annotation = method.getAnnotation(SharedMethod.class);
+                SharedMethod sharedMethod = (SharedMethod) annotation;
+                ArrayList<BindHandler> methodBindHandlers = bindHandlerHashMap.get(sharedMethod.key());
+                if (methodBindHandlers == null)
+                    methodBindHandlers = new ArrayList<>();
+
+                methodBindHandlers.add(new BindHandler(method, target, sharedMethod));
+
+                bindHandlerHashMap.put(sharedMethod.key(), methodBindHandlers);
+            }
+
+        }
+    }
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
         Log.e("load", s);
-        sharedPreferences.unregisterOnSharedPreferenceChangeListener(this);
-
-
-        ArrayList<BindHandler> viewBinds = fieldBindHandlerHashMap.get(s);
+        ArrayList<BindHandler> viewBinds = bindHandlerHashMap.get(s);
         if (viewBinds != null) {
+            Collections.sort(viewBinds, new PriorityComparator());
             for (BindHandler bindHandler : viewBinds) {
-                bindHandler.getTargetField().setAccessible(true);
-                if (bindHandler.getSharedObj() == SharedObj.STRING) {
-                    try {
-                        if (isView(bindHandler.getTargetField().get(bindHandler.getTarget()))) {
-
-                            ((AppCompatTextView) (bindHandler.getTargetField().get(bindHandler.getTarget()))).setText(sharedPreferences.getString(s, bindHandler.getSharedObj().getDefValue().toString()));
-                        } else {
-                            Log.e("value", "" + bindHandler.getTargetField().getInt(bindHandler.getTarget()));
-                            bindHandler.getTargetField().setInt(bindHandler.getTarget(), 234);
-                            Log.e("jksj","K");
-//                            bindHandler.getTargetField().set(bindHandler.getTarget(), sharedPreferences.getString(s, bindHandler.getSharedObj().getDefValue().toString()));
-                        }
-                    } catch (IllegalAccessException e) {
-                        e.printStackTrace();
-                    }
+                if (bindHandler.getMethod() == null) {
+                    processField(bindHandler, sharedPreferences, s);
+                } else {
+                    processMethods(bindHandler, sharedPreferences, s);
                 }
             }
         }
 
 
-        ArrayList<BindHandler> methodBinds = methodBindHandlerHashMap.get(s);
-        if (methodBinds != null) {
-            for (BindHandler bindHandler : methodBinds) {
-                try {
-                    bindHandler.getMethod().invoke(bindHandler.getTarget());
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
-                } catch (InvocationTargetException e) {
-                    e.printStackTrace();
-                }
+    }
+
+
+    private void processField(BindHandler bindHandler, SharedPreferences sharedPreferences, String s) {
+
+        try {
+            bindHandler.getTargetField().setAccessible(true);
+            if (isView(bindHandler.getTargetField().get(bindHandler.getTarget()))) {
+
+                ((AppCompatTextView) (bindHandler.getTargetField().get(bindHandler.getTarget()))).setText(sharedPreferences.getString(s, bindHandler.getSharedObj().getDefValue().toString()));
+            } else {
+//                bindHandler.getTargetField().set(bindHandler.getTarget(), sharedPreferences.getString(s, bindHandler.getSharedObj().getDefValue().toString()));
+                bindHandler.getTargetField().set(bindHandler.getTarget(), 3);
             }
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
         }
+
+    }
+
+    private void processMethods(BindHandler bindHandler, SharedPreferences sharedPreferences, String s) {
+        try {
+            bindHandler.getMethod().invoke(bindHandler.getTarget());
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    @Override
+    public boolean onPreferenceChange(Preference preference, Object o) {
+        return false;
     }
 }
