@@ -17,20 +17,19 @@ import java.util.Calendar;
 import xyz.belvi.sharedview.Sharedpref.SharedBind;
 import xyz.belvi.sharedview.Sharedpref.SharedField;
 import xyz.belvi.sharedview.Sharedpref.SharedMethod;
-import xyz.belvi.sharedview.Sharedpref.SharedObj;
 
 public class MainActivity extends AppCompatActivity {
 
 
-    @SharedField(key = "sample", dataType = SharedObj.STRING)
+    @SharedField(key = "sample")
     public TextView helloPref;
 
     @SharedField(key = "sample")
-    public int data = 5;
+    public String data = "";
 
     SharedBind sharedBind = new SharedBind();
 
-    @SharedMethod(key = "sample", dataType = SharedObj.STRING)
+    @SharedMethod(key = "sample")
     public void methodTest() {
         Log.e("test", "" + data);
     }

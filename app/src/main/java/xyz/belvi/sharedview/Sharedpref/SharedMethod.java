@@ -13,7 +13,6 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 public @interface SharedMethod {
 
-    SharedObj dataType() default SharedObj.STRING;
 
     int priority() default 0;
 

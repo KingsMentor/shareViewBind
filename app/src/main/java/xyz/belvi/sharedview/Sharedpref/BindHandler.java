@@ -10,7 +10,6 @@ import java.lang.reflect.Method;
 public class BindHandler {
     private Field targetField;
     private OperationType operationType;
-    private SharedObj sharedObj;
     private Method method;
     private Object target;
     private int priority;
@@ -19,7 +18,6 @@ public class BindHandler {
     public BindHandler(Field targetField, Object target, SharedField sharedView) {
         this.targetField = targetField;
         this.target = target;
-        sharedObj = sharedView.dataType();
         operationType = sharedView.operationType();
         priority = sharedView.priority();
     }
@@ -28,7 +26,6 @@ public class BindHandler {
     public BindHandler(Method method, Object target, SharedMethod sharedMethod) {
         this.method = method;
         this.target = target;
-        sharedObj = sharedMethod.dataType();
         operationType = sharedMethod.operationType();
         priority = sharedMethod.priority();
     }
@@ -73,11 +70,4 @@ public class BindHandler {
         this.targetField = targetField;
     }
 
-    public SharedObj getSharedObj() {
-        return sharedObj;
-    }
-
-    public void setSharedObj(SharedObj sharedObj) {
-        this.sharedObj = sharedObj;
-    }
 }

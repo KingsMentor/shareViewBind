@@ -12,13 +12,13 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
 public @interface SharedField {
-    SharedObj dataType() default SharedObj.STRING;
 
     int priority() default 0;
 
     OperationType operationType() default OperationType.CHANGE_TEXT;
 
     String key() default "default";
+
 
 }
 
