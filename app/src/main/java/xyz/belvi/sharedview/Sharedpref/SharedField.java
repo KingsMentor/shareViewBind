@@ -13,6 +13,11 @@ import java.lang.annotation.Target;
 @Target(ElementType.FIELD)
 public @interface SharedField {
 
+
+    Class classType() default String.class;
+
+    String defaultValue() default "";
+
     int priority() default 0;
 
     OperationType operationType() default OperationType.CHANGE_TEXT;

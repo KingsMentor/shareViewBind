@@ -119,9 +119,9 @@ public class SharedBind extends Validator implements SharedPreferences.OnSharedP
             bindHandler.getTargetField().setAccessible(true);
             if (isView(bindHandler.getTargetField().get(bindHandler.getTarget()))) {
 
-                ((AppCompatTextView) (bindHandler.getTargetField().get(bindHandler.getTarget()))).setText(sharedPreferences.getString(s, ""));
+                ((AppCompatTextView) (bindHandler.getTargetField().get(bindHandler.getTarget()))).setText(sharedPreferences.getString(s, bindHandler.getDefaultValue()));
             } else {
-                bindHandler.getTargetField().set(bindHandler.getTarget(), sharedPreferences.getString(s, ""));
+                bindHandler.getTargetField().set(bindHandler.getTarget(), sharedPreferences.getString(s, bindHandler.getDefaultValue()));
 //                bindHandler.getTargetField().set(bindHandler.getTarget(), 3);
             }
         } catch (IllegalAccessException e) {

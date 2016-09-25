@@ -13,6 +13,8 @@ public class BindHandler {
     private Method method;
     private Object target;
     private int priority;
+    private Class classType;
+    private String defaultValue;
 
 
     public BindHandler(Field targetField, Object target, SharedField sharedView) {
@@ -20,6 +22,8 @@ public class BindHandler {
         this.target = target;
         operationType = sharedView.operationType();
         priority = sharedView.priority();
+        classType = sharedView.classType();
+        defaultValue = sharedView.defaultValue();
     }
 
 
@@ -28,6 +32,7 @@ public class BindHandler {
         this.target = target;
         operationType = sharedMethod.operationType();
         priority = sharedMethod.priority();
+
     }
 
     public int getPriority() {
@@ -70,4 +75,19 @@ public class BindHandler {
         this.targetField = targetField;
     }
 
+    public String getDefaultValue() {
+        return this.defaultValue;
+    }
+
+    public void setDefaultValue(String defaultValue) {
+        this.defaultValue = defaultValue;
+    }
+
+    public Class getClassType() {
+        return this.classType;
+    }
+
+    public void setClassType(Class classType) {
+        this.classType = classType;
+    }
 }

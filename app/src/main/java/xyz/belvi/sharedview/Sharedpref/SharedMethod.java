@@ -20,5 +20,7 @@ public @interface SharedMethod {
 
     String key() default "default";
 
+
+
 }
 

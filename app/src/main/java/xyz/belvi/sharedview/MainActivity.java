@@ -21,7 +21,7 @@ import xyz.belvi.sharedview.Sharedpref.SharedMethod;
 public class MainActivity extends AppCompatActivity {
 
 
-    @SharedField(key = "sample")
+    @SharedField(key = "sample", defaultValue = "0l")
     public TextView helloPref;
 
     @SharedField(key = "sample")
