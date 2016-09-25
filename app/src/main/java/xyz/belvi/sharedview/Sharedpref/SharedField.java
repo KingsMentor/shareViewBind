@@ -19,6 +19,5 @@ public @interface SharedField {
 
     String key() default "default";
 
-
 }
 
