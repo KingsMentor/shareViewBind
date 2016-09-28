@@ -5,4 +5,9 @@ package xyz.belvi.sharedview.Sharedpref;
  */
 
 public class ShareBindException extends Exception {
+
+    public ShareBindException(String message) {
+        super(message);
+
+    }
 }

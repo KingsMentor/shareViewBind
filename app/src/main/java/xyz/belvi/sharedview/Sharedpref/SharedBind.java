@@ -2,7 +2,6 @@ package xyz.belvi.sharedview.Sharedpref;
 
 import android.content.SharedPreferences;
 import android.preference.Preference;
-import android.util.Base64;
 import android.util.Log;
 import android.widget.CompoundButton;
 import android.widget.TextView;
@@ -115,25 +114,6 @@ public class SharedBind extends Validator implements SharedPreferences.OnSharedP
     }
 
 
-    public void putByte(SharedPreferences sharedPreferences, String key, byte b) {
-        sharedPreferences.edit().putString(key, String.valueOf(b)).commit();
-    }
-
-    public void putByteArray(SharedPreferences sharedPreferences, String key, byte[] b) {
-        sharedPreferences.edit().putString(key, Base64.encodeToString(b, Base64.DEFAULT)).commit();
-    }
-
-
-    public byte getByte(SharedPreferences sharedPreferences, String key, byte b) {
-        return Byte.valueOf(sharedPreferences.getString(key, String.valueOf(b)));
-    }
-
-    public byte[] getByteArray(SharedPreferences sharedPreferences, String key, byte b[]) {
-        String value = sharedPreferences.getString(key, Base64.encodeToString(b, Base64.DEFAULT));
-        return Base64.decode(value, Base64.DEFAULT);
-    }
-
-
     private void processField(BindHandler bindHandler, SharedPreferences sharedPreferences, String s) {
 
         try {
@@ -153,7 +133,7 @@ public class SharedBind extends Validator implements SharedPreferences.OnSharedP
     private void viewOperation(BindHandler bindHandler, SharedPreferences sharedPreferences, String s) throws IllegalAccessException {
         if (bindHandler.getOperationType() == OperationType.CHANGE_TEXT) {
             if (bindHandler.getTargetField().get(bindHandler.getTarget()) instanceof TextView)
-                ((TextView) (bindHandler.getTargetField().get(bindHandler.getTarget()))).setText(sharedPreferences.getString(s, bindHandler.getDefaultValue()));
+                ((TextView) (bindHandler.getTargetField().get(bindHandler.getTarget()))).setText(String.valueOf(getValue(bindHandler.getClassType(), sharedPreferences, s, bindHandler.getDefaultValue())));
         } else if (bindHandler.getOperationType() == OperationType.CHECK) {
             ((CompoundButton) (bindHandler.getTargetField().get(bindHandler.getTarget()))).setChecked(false);
         }

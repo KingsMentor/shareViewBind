@@ -1,6 +1,7 @@
 package xyz.belvi.sharedview;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -21,7 +22,7 @@ import xyz.belvi.sharedview.Sharedpref.SharedMethod;
 public class MainActivity extends AppCompatActivity {
 
 
-    @SharedField(key = "sample",  defaultValue = "0l")
+    @SharedField(key = "sample", defaultValue = "0l", classType = Bitmap.class)
     public CheckBox helloPref;
 
     @SharedField(key = "sample")
