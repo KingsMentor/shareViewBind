@@ -1,8 +1,15 @@
 package xyz.belvi.sharedview.Sharedpref;
 
 import android.content.SharedPreferences;
+import android.os.Parcelable;
 import android.util.Base64;
 import android.view.View;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
+import java.io.Serializable;
+
 
 /**
  * Created by zone2 on 9/22/16.
@@ -10,13 +17,40 @@ import android.view.View;
 
 public class Validator {
 
+    private Gson gson = new GsonBuilder().create();
+
     public boolean isView(Object target) {
         return target instanceof View;
     }
 
+
     public boolean isSharedCandidate(Class objectClass) {
         return objectClass == String.class || objectClass == Integer.class || objectClass == Long.class
                 || objectClass == Float.class || objectClass == Boolean.class || objectClass == Byte.class;
+    }
+
+    public void putParcelable(SharedPreferences sharedPreferences, String key, Parcelable parcelable) {
+        sharedPreferences.edit().putString(key, gson.toJson(parcelable)).commit();
+    }
+
+    public Parcelable getParcelable(SharedPreferences sharedPreferences, String key) {
+        return gson.fromJson(sharedPreferences.getString(key, ""), Parcelable.class);
+    }
+
+    public void putSerializable(SharedPreferences sharedPreferences, String key, Serializable serializable) {
+        sharedPreferences.edit().putString(key, gson.toJson(serializable)).commit();
+    }
+
+    public Serializable getSerializable(SharedPreferences sharedPreferences, String key) {
+        return gson.fromJson(sharedPreferences.getString(key, ""), Serializable.class);
+    }
+
+    public void putPOJO(SharedPreferences sharedPreferences, String key, Object pojo) {
+        sharedPreferences.edit().putString(key, gson.toJson(pojo)).commit();
+    }
+
+    public Object getPOJO(SharedPreferences sharedPreferences, String key) {
+        return gson.fromJson(sharedPreferences.getString(key, ""), Object.class);
     }
 
 
