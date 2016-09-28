@@ -6,8 +6,5 @@ package xyz.belvi.sharedview.Sharedpref;
 
 public enum OperationType {
 
-    CHANGE_TEXT, VISIBLE, GONE, INVISIBLE,
-    CHANGE_TEXT_VISIBLE,
-    CHANGE_TEXT_GONE,
-    CHANGE_TEXT_INVISIBLE;
+    CHANGE_TEXT, ToggleVisibility, CHECK, SELECT;
 }

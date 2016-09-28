@@ -10,7 +10,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.TextView;
+import android.widget.CheckBox;
 
 import java.util.Calendar;
 
@@ -21,8 +21,8 @@ import xyz.belvi.sharedview.Sharedpref.SharedMethod;
 public class MainActivity extends AppCompatActivity {
 
 
-    @SharedField(key = "sample", defaultValue = "0l")
-    public TextView helloPref;
+    @SharedField(key = "sample",  defaultValue = "0l")
+    public CheckBox helloPref;
 
     @SharedField(key = "sample")
     public String data = "";
@@ -38,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        helloPref = (TextView) findViewById(R.id.fieldTxt);
+        helloPref = (CheckBox) findViewById(R.id.fieldTxt);
         sharedBind.shareView(this);
         sharedBind.bind(getSharedPreferences("default", Context.MODE_PRIVATE));
 
