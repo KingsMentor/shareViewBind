@@ -50,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                sharedBind.putParcelable(getSharedPreferences("default", Context.MODE_PRIVATE), "parceble", new Sample());
                 getSharedPreferences("default", Context.MODE_PRIVATE).edit().putString("sample", "yea" + Calendar.getInstance().getTimeInMillis()).commit();
 //                sharedBind.putString(getSharedPreferences("default", Context.MODE_PRIVATE), "sample", "yea" + Calendar.getInstance().getTimeInMillis());
                 Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)

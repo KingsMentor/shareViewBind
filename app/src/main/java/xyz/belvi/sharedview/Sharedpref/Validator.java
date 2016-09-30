@@ -30,6 +30,7 @@ public class Validator {
     }
 
     public void putParcelable(SharedPreferences sharedPreferences, String key, Parcelable parcelable) {
+        String d = gson.toJson(parcelable);
         sharedPreferences.edit().putString(key, gson.toJson(parcelable)).commit();
     }
 
@@ -49,7 +50,7 @@ public class Validator {
         sharedPreferences.edit().putString(key, gson.toJson(pojo)).commit();
     }
 
-    public Object getPOJO(SharedPreferences sharedPreferences, String key) {
+    public Object getPOJO (SharedPreferences sharedPreferences, String key) {
         return gson.fromJson(sharedPreferences.getString(key, ""), Object.class);
     }
 
@@ -58,12 +59,12 @@ public class Validator {
         sharedPreferences.edit().putString(key, Base64.encodeToString(b, Base64.DEFAULT)).commit();
     }
 
-    public byte[] getByteArray(SharedPreferences sharedPreferences, String key, byte b[]) {
+    public byte[]  getByteArray(SharedPreferences sharedPreferences, String key, byte b[]) {
         String value = sharedPreferences.getString(key, Base64.encodeToString(b, Base64.DEFAULT));
         return Base64.decode(value, Base64.DEFAULT);
     }
 
-    public Object getValue(Class objectClass, SharedPreferences sharedPreferences, String s, String defaultValue) {
+    public Object  getValue(Class objectClass, SharedPreferences sharedPreferences, String s, String defaultValue) {
 
         if (isSharedCandidate(objectClass)) {
             if (objectClass == String.class) {
